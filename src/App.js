@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import './App.css';
-
+import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 
 
 function Header(props){
@@ -49,6 +49,87 @@ function Comment(props){
     );
 }
 
+function add_comment(user, type, text, id){
+    const mutation = `
+mutation{
+  createComment(${type}Id:${id}, description:"${text}", userId: ${user.id}){
+    id
+  }
+}`;
+    return fetch("https://smart-pol-api.herokuapp.com/api", {
+        body: JSON.stringify({
+            query : mutation
+        }),
+        cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+        headers: {
+            'content-type': 'application/json'
+        },
+        method: 'POST', // *GET, POST, PUT, DELETE, etc.
+        mode: 'cors', // no-cors, cors, *same-origin
+        redirect: 'follow', // manual, *follow, error
+        referrer: 'no-referrer', // *client, no-referrer
+    });
+}
+
+
+
+class AddComment extends Component {
+    state = {
+        editing : false,
+        comment : ""
+    }
+    constructor(){
+        super();
+        this.handleChange = this.handleChange.bind(this);
+        this.handlePost = this.handlePost.bind(this);
+        this.handleCancel = this.handleCancel.bind(this);
+        this.handleStartEdit = this.handleStartEdit.bind(this);
+    }
+    handleCancel(){
+        this.setState({
+            editing : false,
+            comment : ""
+        });
+    }
+    handleStartEdit(){
+        this.setState({
+            editing : true
+        });
+    }
+    handlePost(){
+        var entity = this.props.entity;
+        var comment = this.state.comment.trim();
+        var type = entity.type;
+        var id = entity.data.id;
+        var user = this.props.user;
+        add_comment(user, type, comment, id);
+        var c = {
+            description : comment,
+            user : this.props.user,
+            createdAt : new Date().toISOString()
+        };
+        this.props.comments.push(c);
+        this.props.onCommentAdd(c);
+        this.handleCancel();
+    }
+
+    handleChange(e){
+        this.setState({ comment : e.target.value });
+    }
+    render(){
+        if(this.state.editing){
+            return (
+            <div>
+                    <div><textarea rows="5" cols="60" onChange={this.handleChange} value={this.state.comment}/></div>
+                    <a href="#" onClick={this.handlePost}>Post</a>
+                    <a href="#" onClick={this.handleCancel}>Cancel</a>
+            </div>);
+        }else {
+            return (<a href="#" onClick={this.handleStartEdit} className="colorBlue"> add a comment </a>);
+        }
+    }
+}
+
 function CommentsList(props){
     const comments = props.comments;
     return (
@@ -58,9 +139,9 @@ function CommentsList(props){
             <li>
                 <hr className="margin7-0"/>
             </li>
-            { comments.map(c => (<Comment text={c.text} user={c.user} date={c.createdAt} />)) }
+            { comments.map(c => (<Comment text={c.description} user={c.creator} date={c.createdAt} />)) }
             <li>
-                <a href="#" className="colorBlue"> add a comment </a>
+            <AddComment comments={comments} user={props.user} entity={props.entity} onCommentAdd={props.onCommentAdd}/>
             </li>
         </ul>
     </div>
@@ -69,14 +150,30 @@ function CommentsList(props){
 
 function Answer(props){
     const answer = props.answer;
+    const hasAccepted = props.hasAccepted;
+    const onVote = !answer.hasVoted ? props.onVote : function(){};
+    const onAccept = !hasAccepted ? props.onAccept : function(){};
     const profilePic = answer.user ? <img src={answer.user.profilePic || "sources/user.png"} className="postUserImg"/> : null;
+    var tick = null;
+    if (answer.accepted) {
+        tick = (<div className="marginTop10"
+                     onClick={()=>props.onAccept(answer)}>
+                    <img src="sources/ok.png"  className="width30"/>
+                </div>);
+    }else {
+        tick = (<div className="tick marginTop10"
+                onClick={()=>onAccept(answer)}>
+                {!hasAccepted ? <img src="sources/un_ok.png" className="width30"/> : null}
+                </div>);
+
+    }
     return (
         <div className="answer flex margin30">
           <div className="votesAnswer">
-              <a href="#"> <img src="sources/up.png" className="width30" /></a>
+            <a href="#" onClick={()=> onVote(true, answer)}> <img src="sources/up.png" className="width30" /></a>
             <div className="votesNo">{answer.totalVotes || 0}</div>
-              <a href="#"> <img src="sources/down.png"  className="width30" /></a>
-              <div className="tick marginTop10"><img src="sources/un_ok.png" className="width30"/></div>
+            <a href="#" onClick={()=> onVote(false, answer)}> <img src="sources/down.png"  className="width30" /></a>
+            {tick}
           </div>
           <div className="flex10">
             <p className="marginBottom15">
@@ -87,7 +184,6 @@ function Answer(props){
             <a href="#" className="colorBlue"> {(answer.user || {}).name} </a>
             <span className="postDate"> {answer.createdAt} </span>
             </div>
-            <CommentsList comments={answer.comments || []} />
 
           </div>
           <div className="whiteBlock">  </div>
@@ -100,19 +196,26 @@ function Answer(props){
 
 
 function AnswersList(props){
-    return ( <div> { props.answers.map(a => <Answer answer={a} />) } </div> );
+    var answers = props.answers;
+    var acceptedAnswers = answers.filter(a => a.accepted);
+    var hasAccepted = acceptedAnswers.length > 0;
+    return ( <div> { props.answers.map(a => (<Answer onCommentAdd={props.onCommentAdd}
+                                             user={props.user} hasAccepted={hasAccepted}
+                                             onAccept={props.onAccept}
+                                             onVote={props.onVote} answer={a} />)) } </div>);
 }
 
 
 function Question(props){
     var question = props.question;
+    var hasVoted = question.hasVoted;
     const profilePic = question.user ? <img src={(question.user || {}).profilePic || "sources/user.png" } className="postUserImg"/> : null;
     return (
 <div className="flex margin30">
       <div className="votesPost marginTop22">
-          <a href="#"> <img src="sources/up.png" className="width30" /></a>
+            <a href="#" onClick={!hasVoted ? ()=> props.onVote(true, question) : null}> <img src="sources/up.png" className="width30" /></a>
             <div className="votesNo">{question.totalVotes || 0}</div>
-          <a href="#"> <img src="sources/down.png" className="width30" /></a>
+            <a href="#" onClick={!hasVoted ? ()=> props.onVote(false, question) : null}> <img src="sources/down.png" className="width30" /></a>
       </div>
       <div className="flex10">
             <h2> {question.title} <span className="postDate"> {question.createdAt} </span> </h2>
@@ -124,7 +227,7 @@ function Question(props){
             <a href="#" className="colorBlue"> {(question.user || {}).name} </a>
             </div>
 
-            <CommentsList comments={question.comments || []} />
+            <CommentsList user={props.user} onCommentAdd={props.onCommentAdd} entity={{type: "post", data : question}} comments={question.comments || []} />
 
       </div>
       <div className="whiteBlock"> </div>
@@ -135,36 +238,65 @@ function Question(props){
 }
 
 
-function cast_vote(post, isUp){
+function capitalize(str){
+    var first = str[0];
+    var rest = str.substr(1, str.length);
+    return first.toUpperCase() + rest;
+}
+
+function cast_vote(post, type, isUp){
     const mutation = `
 mutation {
-  updatePostVote(postId: ${post.id}, increase:${isUp === true}) {
+  update${capitalize(type)}Vote(${type}Id: ${post.id}, increase:${isUp === true}) {
     description
     id
     totalVotes
   }
 }`;
-
+    return fetch("https://smart-pol-api.herokuapp.com/api", {
+        body: JSON.stringify({
+            query : mutation
+        }),
+        cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+        headers: {
+            'content-type': 'application/json'
+        },
+        method: 'POST', // *GET, POST, PUT, DELETE, etc.
+        mode: 'cors', // no-cors, cors, *same-origin
+        redirect: 'follow', // manual, *follow, error
+        referrer: 'no-referrer', // *client, no-referrer
+    });
 }
 
-function upvote(post){
-    return cast_vote(post, true)
-}
-
-function downvote(post){
-    return cast_vote(post, false);
+function acceptCall(answer){
+    const mutation = ``;
+    return fetch("https://smart-pol-api.herokuapp.com/api", {
+        body: JSON.stringify({
+            query : mutation
+        }),
+        cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+        headers: {
+            'content-type': 'application/json'
+        },
+        method: 'POST', // *GET, POST, PUT, DELETE, etc.
+        mode: 'cors', // no-cors, cors, *same-origin
+        redirect: 'follow', // manual, *follow, error
+        referrer: 'no-referrer', // *client, no-referrer
+    });
 }
 
 function queryForQuestion(questionId, currentUserId){
   const query =  `
 query {
 	user(id: ${currentUserId}){
+    id,
     name,
     image,
     points,
     type
   }
   post(id: ${questionId}){
+    id,
     title,
     createdAt,
     description,
@@ -192,7 +324,7 @@ query {
     }
   }
 }`;
-    return  fetch("http://smartpol.40k.ro:4000/api", {
+    return  fetch("https://smart-pol-api.herokuapp.com/api", {
         body: JSON.stringify({
             query : query
         }),
@@ -216,19 +348,48 @@ class App extends Component {
         });
     }
     render() {
+        const self = this;
         var data = this.state || {};
         var q = data.post || {};
         var answers = q.answers || [];
         var user = data.user || {};
+        const updateVote = function(isUp, post){
+            if(isUp)
+                post.totalVotes++;
+            else
+                post.totalVotes--;
+            post.hasVoted = true;
+            self.setState(data);
+        };
+        const acceptAnswer = function(answer){
+            answer.accepted = !answer.accepted;
+            self.setState(data);
+
+            acceptCall(answer);
+        };
       return (
       <div>
               <Header user={user}/>
-              <Question question={q}/>
+              <Question onCommentAdd={(c)=> this.setState(this.state)} user={user} question={q} onVote={(isUp, q) =>{
+                  updateVote(isUp, q);
+                  cast_vote(q, "post", isUp).then(null, function(){
+                      updateVote(!isUp, q);
+                  });
+              }}/>
               <AnswersTitle count={answers.length || 0} />
-              <AnswersList answers={answers} />
+              <AnswersList user={user} answers={answers}
+                onAccept={acceptAnswer}
+                onCommentAdd={(c)=> this.setState(this.state)}
+                onVote={(isUp, q) => {
+                  updateVote(isUp, q);
+                  cast_vote(q, "answer", isUp).then(null, function(){
+                      updateVote(!isUp, q);
+                  });
+              }} />
       </div>
     );
   }
 }
+
 
 export default App;
