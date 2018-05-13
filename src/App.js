@@ -11,7 +11,18 @@ function Header(props){
             <img src="sources/logo.png" className="width160" />
         </div>
 
-        <div className="flex10">
+        <div class="flex2">
+          <ul class="nav navbar-nav">
+            <li class="active">
+              <a href="#" class="colorBlue">Questions</a>
+            </li>
+            <li>
+              <a href="#" class="colorBlue">Posts</a>
+            </li>
+          </ul>
+        </div>
+
+        <div className="flex8">
             <div className="inner-addon left-addon marginTop10">
                 <i className="glyphicon glyphicon-search colorBlue searchIcon"></i>
                 <input type="text" className="searchInput" placeholder="Search" />
