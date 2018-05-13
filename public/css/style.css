@@ -6,8 +6,16 @@
     flex: 1;
 }
 
+.flex2 {
+    flex: 2;
+}
+
 .flex8 {
     flex: 8;
+}
+
+.flex9 {
+    flex: 9;
 }
 
 .flex10 {
@@ -19,7 +27,9 @@
 }
 
 .header {
-  margin-top: 5px;
+  position: sticky;
+  top: 0px;
+  background-color: #F8F8F8;
 }
 
 .logo {
@@ -40,11 +50,20 @@
   color: #073254;
 }
 
+.colorGrey {
+  color: #C8C8C8;
+}
+
 .userInfo {
   text-align: right;
   margin-right: 15px;
   margin-top: 12px;
   flex: 2;
+}
+
+.profileImg {
+  max-width: 150px;
+  max-height: 150px;
 }
 
 .userImg {
@@ -54,6 +73,11 @@
 
 .postUserImg {
   width: 30px;
+  border-radius: 50%;
+}
+
+.blogUserImg {
+  width: 80px;
   border-radius: 50%;
 }
 
@@ -167,4 +191,104 @@
 .searchIcon {
   padding-top: 7px !important;
   color: #C8C8C8;
+}
+
+.questionWrap {
+  max-height: 35px;
+  overflow:hidden;
+  display:inline-block;
+  text-overflow: ellipsis;
+}
+
+.questionInfo {
+  text-align: center;
+  color: #C8C8C8;
+  margin-right: 15px;
+}
+
+.answered {
+  margin-top: 5px;
+  color: #073254;
+  border: 2px solid #073254;
+}
+
+.stats {
+  padding-top: 5px;
+  padding-bottom: 5px;
+}
+
+.count {
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.statsName {
+  font-size: 11px;
+}
+
+.questionButton {
+  text-align: right;
+  margin-right: 15px;
+  margin-top: 20px;
+}
+
+.button {
+  padding: 10px 30px;
+  background-color: #073254;
+  color: white;
+}
+
+.button:hover  {
+  color: white;
+  opacity: 0.8;
+  text-decoration: none;
+}
+
+.button a:visited {
+  color: white;
+  text-decoration: none;
+}
+
+.listTitle {
+  font-weight: bold;
+  margin-top: 5px;
+  margin-bottom: 5px;
+  font-size: 16px;
+}
+
+.user {
+  float: left;
+}
+
+.tags {
+  float: right;
+  margin-top: 3px;
+}
+
+.tag {
+  padding: 3px;
+  background-color: #C8C8C8;
+  color: black;
+  margin: 3px;
+}
+
+.clearfix::after {
+    content: "";
+    clear: both;
+    display: table;
+}
+
+.profileName {
+  font-size: 20px;
+  font-weight: bold;
+  margin: 10px;
+}
+
+.profileInfo {
+  font-size: 14px;
+  margin-left: 10px;
+}
+
+.achievements {
+  max-width: 500px;
 }
