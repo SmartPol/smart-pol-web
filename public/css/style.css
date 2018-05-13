@@ -1,0 +1,170 @@
+.flex {
+    display: flex;
+}
+
+.flex1 {
+    flex: 1;
+}
+
+.flex8 {
+    flex: 8;
+}
+
+.flex10 {
+    flex: 10;
+}
+
+.whiteBlock {
+  flex: 2;
+}
+
+.header {
+  margin-top: 5px;
+}
+
+.logo {
+  margin-left: 15px;
+  margin-top: 4px;
+  flex: 2;
+}
+
+.width160 {
+  width: 160px;
+}
+
+.width30 {
+  width: 30px;
+}
+
+.colorBlue {
+  color: #073254;
+}
+
+.userInfo {
+  text-align: right;
+  margin-right: 15px;
+  margin-top: 12px;
+  flex: 2;
+}
+
+.userImg {
+  max-width: 30px;
+  border-radius: 50%;
+}
+
+.postUserImg {
+  width: 30px;
+  border-radius: 50%;
+}
+
+.margin30 {
+  margin: 30px;
+}
+
+.marginLeft30 {
+  margin-left: 30px;
+}
+
+.marginBottom15 {
+  margin-bottom: 15px;
+}
+
+.marginBottom25 {
+  margin-bottom: 25px;
+}
+
+.marginTop10 {
+  margin-top: 10px;
+}
+
+.marginTop22 {
+  margin-top: 22px;
+}
+
+.votesPost {
+  text-align: center;
+  align-self: flex-start;
+  flex: 2;
+}
+
+.votesAnswer {
+  text-align: center;
+  align-self: flex-start;
+  flex: 2;
+  margin-left: 35px;
+}
+
+.votesNo {
+  font-size: 18px;
+  font-weight: bold;
+  margin: 0;
+}
+
+.postDate {
+  font-size: 14px;
+  color: #C8C8C8;
+  font-style: italic;
+}
+
+.date {
+  font-size: 12px;
+  color: #C8C8C8;
+  font-style: italic;
+}
+
+.bold {
+  font-weight: bold;
+}
+
+.commentsList {
+  list-style-type:none;
+  font-size: 12px;
+  padding-left: 30px;
+}
+
+.margin7-0 {
+  margin-bottom: 7px;
+  margin-top: 7px;
+}
+
+.answers {
+  font-weight: bold;
+  margin-left: 100px;
+}
+.inner-addon {
+    position: relative;
+}
+
+.inner-addon .glyphicon {
+  position: absolute;
+  padding: 10px;
+  pointer-events: none;
+}
+
+.left-addon .glyphicon  { left:  0px;}
+.right-addon .glyphicon { right: 0px;}
+
+.left-addon input  { padding-left:  30px; }
+.right-addon input { padding-right: 30px; }
+
+.answer .tick {
+  display: none;
+}
+
+.answer:hover .tick {
+  display: block;
+}
+
+.searchInput {
+  border: 0;
+  outline: 0;
+  background: transparent;
+  border-bottom: 1px solid #C8C8C8;
+  height: 30px;
+  width: 100%
+}
+
+.searchIcon {
+  padding-top: 7px !important;
+  color: #C8C8C8;
+}
