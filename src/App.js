@@ -14,7 +14,7 @@ function Header(props){
         <div class="flex2">
           <ul class="nav navbar-nav">
             <li class="active">
-              <a href="#" class="colorBlue">Questions</a>
+              <a href="questions.html" class="colorBlue">Questions</a>
             </li>
             <li>
               <a href="#" class="colorBlue">Posts</a>
@@ -33,6 +33,14 @@ function Header(props){
             <a href="#" className="colorBlue"> {(props.user || {}).name }</a>
             {profilePic}
         </div>
+    </div>
+
+    );
+}
+function AskQuestion(props){
+    return (
+    <div className="questionButton">
+      <a href="#" class="button"> Ask a question </a>
     </div>
 
     );
@@ -222,7 +230,7 @@ function Question(props){
     var hasVoted = question.hasVoted;
     const profilePic = question.user ? <img src={(question.user || {}).profilePic || "sources/user.png" } className="postUserImg"/> : null;
     return (
-<div className="flex margin30">
+    <div className="flex margin30">
       <div className="votesPost marginTop22">
             <a href="#" onClick={!hasVoted ? ()=> props.onVote(true, question) : null}> <img src="sources/up.png" className="width30" /></a>
             <div className="votesNo">{question.totalVotes || 0}</div>
@@ -351,7 +359,7 @@ query {
 }
 
 
-class App extends Component {
+export class App extends Component {
     componentDidMount(){
         const self = this;
         queryForQuestion(1,1).then(function(data){
@@ -400,7 +408,29 @@ class App extends Component {
       </div>
     );
   }
+
+
 }
 
 
-export default App;
+export class Questions extends Component {
+  componentDidMount(){
+      const self = this;
+      queryForQuestion(1,1).then(function(data){
+          self.setState(data.data);
+      });
+  }
+  render() {
+      const self = this;
+      var data = this.state || {};
+      var q = data.post || {};
+      var answers = q.answers || [];
+      var user = data.user || {};
+    return (
+        <div>
+                <Header user={user}/>
+                <AskQuestion />
+        </div>
+      );
+  }
+}
